@@ -59,4 +59,5 @@ class DQNAgent:
             self.optimizer.step()
 
         if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
+            self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
+
