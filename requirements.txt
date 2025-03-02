@@ -1,0 +1,6 @@
+sumo
+traci
+numpy
+gym
+matplotlib
+spdlog
