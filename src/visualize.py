@@ -20,7 +20,10 @@ def smooth_data(data, window_size=10):
 log_files = glob.glob(os.path.join(logs_dir, "training_rewards_*.csv"))
 
 for log_file in log_files:
-    hidden_dim = log_file.split("_")[-1].split(".")[0]  # Extract hidden layer size
+    file_parts = log_file.split("_")
+    agent_name = file_parts[-2]  # Extract agent name (e.g., DQN, DQN_Dropout, etc.)
+    hidden_dim = file_parts[-1].split(".")[0]  # Extract hidden layer size
+
     episodes = []
     total_rewards = []
     avg_speeds = []
@@ -30,7 +33,7 @@ for log_file in log_files:
         next(f)  # Skip header
         for line in f:
             try:
-                _, ep, reward, avg_speed = line.strip().split(",")
+                _, _, ep, reward, avg_speed = line.strip().split(",")
                 episodes.append(int(ep))
                 total_rewards.append(float(reward))
                 avg_speeds.append(float(avg_speed))
@@ -49,10 +52,10 @@ for log_file in log_files:
         plt.plot(smoothed_episodes, smoothed_rewards, label="Smoothed Data", linewidth=2, color='red')
         plt.xlabel("Episode")
         plt.ylabel("Total Rewards")
-        plt.title(f"Training Progress - Total Rewards (Hidden {hidden_dim})")
+        plt.title(f"Training Progress - {agent_name} - Total Rewards (Hidden {hidden_dim})")
         plt.legend()
         plt.grid(True)
-        plt.savefig(os.path.join(graphs_dir, f"total_rewards_{hidden_dim}.png"))
+        plt.savefig(os.path.join(graphs_dir, f"total_rewards_{agent_name}_{hidden_dim}.png"))
         plt.close()
 
     # Generate and save Average Speed graph
@@ -62,10 +65,10 @@ for log_file in log_files:
         plt.plot(smoothed_episodes, smoothed_speeds, label="Smoothed Data", linewidth=2, color='blue')
         plt.xlabel("Episode")
         plt.ylabel("Average Speed")
-        plt.title(f"Training Progress - Average Speed (Hidden {hidden_dim})")
+        plt.title(f"Training Progress - {agent_name} - Average Speed (Hidden {hidden_dim})")
         plt.legend()
         plt.grid(True)
-        plt.savefig(os.path.join(graphs_dir, f"average_speed_{hidden_dim}.png"))
+        plt.savefig(os.path.join(graphs_dir, f"average_speed_{agent_name}_{hidden_dim}.png"))
         plt.close()
 
 print(f"Smoothed graphs saved in {graphs_dir}")
