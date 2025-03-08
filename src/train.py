@@ -7,8 +7,11 @@ from dqn import DQNAgent
 from dqn_dropout import DQNDropoutAgent
 from dqn_batchnorm import DQNBatchNormAgent
 from dqn_dueling import DuelingDQNAgent
+from dqn_double import DoubleDQNAgent
+from dqn_per import DQNPERAgent
 from constants import TOTAL_UNITS_OF_SIMULATION, HIDDEN_LAYER_SIZES, EPISODES
 from flow_modifier import modify_vehicle_flow, generate_vehicle_flow_list, get_num_flows
+import traci
 
 # Set up directories for models and logs
 models_dir = os.path.join("..", "models")
@@ -27,16 +30,16 @@ env = SumoTrafficEnv(SUMO_CONFIG)
 
 # Dictionary mapping agent names to their respective classes
 agent_variants = {
-    "DQN": DQNAgent,
-    "DQN_Dropout": DQNDropoutAgent,
-    "DQN_BatchNorm": DQNBatchNormAgent,
-    "DuelingDQN": DuelingDQNAgent
+    "DQNPER": DQNPERAgent,
+    # "DuelingDQN": DuelingDQNAgent,
+    # "DoubleDQN": DoubleDQNAgent,
+    # "DQN": DQNAgent
 }
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Training {agent_variants} on {device} for {EPISODES} episodes of length {TOTAL_UNITS_OF_SIMULATION}")
+print(f"Training {agent_variants}\non {device} for {EPISODES} episodes of length {TOTAL_UNITS_OF_SIMULATION}")
 
-vehicle_flow_values = generate_vehicle_flow_list(num_of_episodes=EPISODES, num_of_flows=get_num_flows(ROUTE_FILE))
+# vehicle_flow_values = generate_vehicle_flow_list(num_of_episodes=EPISODES, num_of_flows=get_num_flows(ROUTE_FILE))
 
 # Train each agent variant with different hidden layer sizes
 for agent_name, AgentClass in agent_variants.items():
@@ -45,14 +48,13 @@ for agent_name, AgentClass in agent_variants.items():
 
         with open(log_file_path, mode='w', newline='') as log_file:
             log_writer = csv.writer(log_file)
-            log_writer.writerow(["Agent", "Hidden_Layer_Size", "Episode", "Total_Rewards", "Average_Speed"])
+            log_writer.writerow(["Agent", "Hidden_Layer_Size", "Episode", "Total_Rewards", "Average_Speed", "Average_Waiting_Time"])
 
             agent = AgentClass(state_dim=len(env.lane_ids) * 2 + 2, action_dim=5, hidden_dim=hidden_dim)
             best_reward = float('-inf')
+            best_model_path = os.path.join(models_dir, f"best_model_{agent_name}_{hidden_dim}.pth")
 
             for episode in range(EPISODES):
-                modify_vehicle_flow(ROUTE_FILE, vehicle_flow_values, episode)
-
                 state = env.reset()
                 total_rewards = 0
                 total_speed = 0
@@ -68,18 +70,19 @@ for agent_name, AgentClass in agent_variants.items():
                     total_speed += sum(state[len(env.lane_ids):len(env.lane_ids) * 2]) / len(env.lane_ids)
 
                 avg_speed = total_speed / TOTAL_UNITS_OF_SIMULATION
+                avg_waiting_time = total_waiting_time / TOTAL_UNITS_OF_SIMULATION
                 agent.train()
 
                 print(
-                    f"{agent_name} - Hidden Dim {hidden_dim} - Episode {episode + 1}: Total Rewards = {abs(total_rewards)},"
-                    f"Total Waiting Time = {total_waiting_time}, Avg Speed = {avg_speed}")
-                log_writer.writerow([agent_name, hidden_dim, episode + 1, total_rewards, avg_speed])
+                    f"{agent_name} - Hidden Dim {hidden_dim} - Episode {episode + 1}: Total Rewards = {abs(total_rewards)}, "
+                    f"Total Waiting Time = {total_waiting_time}, Avg Waiting Time = {avg_waiting_time:.2f}, Avg Speed = {avg_speed}")
+                log_writer.writerow([agent_name, hidden_dim, episode + 1, total_rewards, avg_speed, avg_waiting_time])
 
+                # Save the best model for this agent and hidden layer size
                 if total_rewards > best_reward:
                     best_reward = total_rewards
-                    best_model_path = os.path.join(models_dir, f"best_model_{agent_name}_{hidden_dim}_{abs(best_reward)}.pth")
                     torch.save(agent.model.state_dict(), best_model_path)
-                    print(f"New best model for {agent_name} with hidden_dim {hidden_dim} saved with total rewards {abs(best_reward)}")
+                    print(f"New best model for {agent_name} with hidden_dim {hidden_dim} saved.")
 
 env.close()
 print("Training complete. Best models saved in:", models_dir)

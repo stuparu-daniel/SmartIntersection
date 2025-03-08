@@ -5,6 +5,7 @@ import numpy as np
 import spdlog as spd
 import constants
 from util import create_sumo_command
+from constants import STEP_LENGTH, TOTAL_UNITS_OF_SIMULATION
 
 class SumoTrafficEnv:
     def __init__(self, sumo_config_path):
@@ -15,8 +16,8 @@ class SumoTrafficEnv:
         self.num_phases = 4
         self.phase_durations = [42, 3, 42, 3]  # Initial durations for phases
         self.step_count = 0
-        self.step_length = 0.1
-        self.total_time = 3600
+        self.step_length = STEP_LENGTH
+        self.total_time = TOTAL_UNITS_OF_SIMULATION
         self.steps_to_change_phase = 50  # Empirical value
 
     def reset(self):
@@ -66,7 +67,12 @@ class SumoTrafficEnv:
         state = self.get_state()
         waiting_times = sum(traci.lane.getWaitingTime(lane) for lane in self.lane_ids)
         avg_speed = sum(traci.lane.getLastStepMeanSpeed(lane) for lane in self.lane_ids) / len(self.lane_ids)
-        reward = -(waiting_times - avg_speed * 10)  # Reward higher speeds, penalize waiting
+        avg_waiting_time = waiting_times / len(self.lane_ids) if self.lane_ids else 0
+
+
+        # reward = -(waiting_times - avg_speed * 10)  # Reward higher speeds, penalize waiting
+        # !!!!!!!!!!!!! EXPERIMENT !!!!!!!!!!!!!
+        reward = -(avg_waiting_time - avg_speed * 10)
         done = False
 
         return state, reward, done, waiting_times

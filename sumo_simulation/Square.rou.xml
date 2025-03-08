@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-03-08 17:51:29 by Eclipse SUMO netedit Version 1.21.0
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <!-- Vehicles, persons and containers (sorted by depart) -->
+    <flow id="f_0" begin="0.00" color="red" from="E2" to="E10" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_1" begin="0.00" color="red" from="E2" to="E11" via="E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_10" begin="0.00" color="green" from="-E10" to="E5" via="-E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_11" begin="0.00" color="green" from="-E10" to="E4" via="-E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_12" begin="0.00" color="red" from="-E10" to="E11" via="E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_13" begin="0.00" color="red" from="-E10" to="E9" via="E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_14" begin="0.00" color="green" from="-E10" to="E6" via="-E3 E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_15" begin="0.00" color="red" from="-E10" to="E6" via="E0 -E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_16" begin="0.00" color="red" from="-E10" to="E8" via="E0 -E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_17" begin="0.00" color="green" from="-E10" to="E8" via="-E3 E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_18" begin="0.00" from="-E5" to="E4" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_19" begin="0.00" color="green" from="-E5" to="E6" via="E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_2" begin="0.00" color="green" from="E2" to="E9" via="E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_20" begin="0.00" color="green" from="-E5" to="E8" via="E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_21" begin="0.00" color="red" from="-E5" to="-E2" via="E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_22" begin="0.00" color="red" from="-E5" to="E11" via="E3 E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_23" begin="0.00" color="green" from="-E5" to="E11" via="E1 E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_24" begin="0.00" color="red" from="-E5" to="E9" via="E3 E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_25" begin="0.00" color="green" from="-E5" to="E9" via="E1 E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_26" begin="0.00" color="red" from="-E5" to="E10" via="E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_27" begin="0.00" color="red" from="-E4" to="E5" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_28" begin="0.00" color="green" from="-E4" to="-E2" via="E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_29" begin="0.00" color="green" from="-E4" to="E10" via="E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_3" begin="0.00" from="E2" to="E5" via="-E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_30" begin="0.00" from="-E4" to="E6" via="E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_31" begin="0.00" from="-E4" to="E8" via="E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_32" begin="0.00" color="green" from="-E4" to="E11" via="E3 E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_33" begin="0.00" from="-E4" to="E11" via="E1 E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_34" begin="0.00" color="green" from="-E4" to="E9" via="E3 E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_35" begin="0.00" from="-E4" to="E9" via="E1 E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_36" begin="0.00" from="-E6" to="E8" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_37" begin="0.00" color="red" from="-E6" to="E4" via="-E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_38" begin="0.00" color="red" from="-E6" to="E5" via="-E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_39" begin="0.00" color="red" from="-E6" to="-E2" via="-E1 E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_4" begin="0.00" from="E2" to="E4" via="-E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_40" begin="0.00" color="red" from="-E6" to="E10" via="-E1 E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_41" begin="0.00" color="green" from="-E6" to="-E2" via="E7 -E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_42" begin="0.00" color="green" from="-E6" to="E10" via="E7 -E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_43" begin="0.00" color="green" from="-E6" to="E11" via="E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_44" begin="0.00" color="green" from="-E6" to="E9" via="E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_45" begin="0.00" color="red" from="-E11" to="E9" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_46" begin="0.00" color="green" from="-E11" to="E8" via="-E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_47" begin="0.00" color="green" from="-E11" to="E6" via="-E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_48" begin="0.00" from="-E11" to="E10" via="-E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_49" begin="0.00" from="-E11" to="-E2" via="-E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_5" begin="0.00" from="E2" to="E6" via="-E3 E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_50" begin="0.00" from="-E11" to="E5" via="-E0 -E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_51" begin="0.00" from="-E11" to="E4" via="-E0 -E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_52" begin="0.00" color="green" from="-E11" to="E5" via="-E7 -E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_53" begin="0.00" color="green" from="-E11" to="E4" via="-E7 -E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_54" begin="0.00" from="-E9" to="E11" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_55" begin="0.00" color="green" from="-E9" to="E10" via="-E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_56" begin="0.00" color="green" from="-E9" to="-E2" via="-E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_57" begin="0.00" color="red" from="-E9" to="E8" via="-E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_58" begin="0.00" color="red" from="-E9" to="E6" via="-E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_59" begin="0.00" color="red" from="-E9" to="E4" via="-E7 -E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_6" begin="0.00" from="E2" to="E8" via="-E3 E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_60" begin="0.00" color="red" from="-E9" to="E5" via="-E7 -E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_61" begin="0.00" color="green" from="-E9" to="E4" via="-E0 -E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_62" begin="0.00" color="green" from="-E9" to="E5" via="-E0 -E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_63" begin="0.00" color="red" from="-E8" to="E6" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_64" begin="0.00" color="green" from="-E8" to="E4" via="-E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_65" begin="0.00" color="green" from="-E8" to="E5" via="-E1" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_66" begin="0.00" from="-E8" to="E9" via="E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_67" begin="0.00" from="-E8" to="E11" via="E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_68" begin="0.00" from="-E8" to="E10" via="E7 -E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_69" begin="0.00" from="-E8" to="-E2" via="E7 -E0" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_7" begin="0.00" color="green" from="E2" to="E6" via="E0 -E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_70" begin="0.00" color="green" from="-E8" to="E10" via="-E1 E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_71" begin="0.00" color="green" from="-E8" to="-E2" via="-E1 E3" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_8" begin="0.00" color="green" from="E2" to="E8" via="E0 -E7" end="3600.00" period="exp(0.01)"/>
+    <flow id="f_9" begin="0.00" from="-E10" to="-E2" end="3600.00" period="exp(0.01)"/>
+</routes>

@@ -1,6 +1,7 @@
 sumo
-traci
-numpy
+traci~=1.22.0
+numpy~=1.26.4
 gym
-matplotlib
-spdlog
+matplotlib~=3.8.4
+spdlog~=2.0.6
+torch~=2.3.0
