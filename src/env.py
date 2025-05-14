@@ -1,9 +1,5 @@
-import os
-import sys
 import traci
 import numpy as np
-import spdlog as spd
-import constants
 from util import create_sumo_command
 from constants import STEP_LENGTH, TOTAL_UNITS_OF_SIMULATION
 
@@ -69,9 +65,6 @@ class SumoTrafficEnv:
         avg_speed = sum(traci.lane.getLastStepMeanSpeed(lane) for lane in self.lane_ids) / len(self.lane_ids)
         avg_waiting_time = waiting_times / len(self.lane_ids) if self.lane_ids else 0
 
-
-        # reward = -(waiting_times - avg_speed * 10)  # Reward higher speeds, penalize waiting
-        # !!!!!!!!!!!!! EXPERIMENT !!!!!!!!!!!!!
         reward = -(avg_waiting_time - avg_speed * 10)
         done = False
 

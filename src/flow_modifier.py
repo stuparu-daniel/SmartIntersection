@@ -48,9 +48,5 @@ def modify_vehicle_flow(xml_file: str, traffic_flow_list: list[list[int]], episo
     for flow, vehs_per_hour in zip(flows, flow_values):
         flow.set("vehsPerHour", str(vehs_per_hour))
 
-    # for flow in root.findall(".//flow"):
-    #     new_vehs_per_hour = random.randint(min_value, max_value)
-    #     flow.set("vehsPerHour", str(new_vehs_per_hour))
-
     tree.write(xml_file, encoding="UTF-8", xml_declaration=True)
     print(f"Updated {xml_file} with new vehsPerHour values.")

@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import random
 from collections import deque
 
+
 class DQN(nn.Module):
     def __init__(self, input_dim, output_dim, hidden_dim):
         super(DQN, self).__init__()
@@ -16,6 +17,7 @@ class DQN(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         return self.fc3(x)
+
 
 class DQNAgent:
     def __init__(self, state_dim, action_dim, hidden_dim=128):

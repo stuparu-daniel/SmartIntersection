@@ -1,5 +1,2 @@
-models/*
-logs/*
-graphs/
 .venv
 .idea

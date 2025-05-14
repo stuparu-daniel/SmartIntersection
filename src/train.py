@@ -2,87 +2,82 @@ import os
 import torch
 import csv
 import random
-from env import SumoTrafficEnv
-from dqn import DQNAgent
-from dqn_dropout import DQNDropoutAgent
-from dqn_batchnorm import DQNBatchNormAgent
-from dqn_dueling import DuelingDQNAgent
-from dqn_double import DoubleDQNAgent
-from dqn_per import DQNPERAgent
-from constants import TOTAL_UNITS_OF_SIMULATION, HIDDEN_LAYER_SIZES, EPISODES
-from flow_modifier import modify_vehicle_flow, generate_vehicle_flow_list, get_num_flows
+import time
+
 import traci
 
-# Set up directories for models and logs
-models_dir = os.path.join("..", "models")
+from sumo_wrapper import SumoWrapper
+from constants import TOTAL_UNITS_OF_SIMULATION, EPISODES
+
+# Set up directories for logs and intersections
 logs_dir = os.path.join("..", "logs")
-os.makedirs(models_dir, exist_ok=True)
+intersections_dir = os.path.join("..", "intersections_128_throughput")  # Folder to store best RL models
 os.makedirs(logs_dir, exist_ok=True)
+os.makedirs(intersections_dir, exist_ok=True)
 
 random.seed(0)
 torch.manual_seed(0)
 
-SUMO_CONFIG = os.path.join("..", "sumo_simulation", "Test3.sumocfg")
-ROUTE_FILE = os.path.join("..", "sumo_simulation", "Test3.rou.xml")
+SUMO_CONFIG = os.path.join("..", "sumo_simulation", "Square.sumocfg")
+MODEL_DIR = os.path.join("..", "use_models")
+sumo_wrapper = SumoWrapper(SUMO_CONFIG, MODEL_DIR)
 
-# Initialize SUMO Environment
-env = SumoTrafficEnv(SUMO_CONFIG)
+log_file_path = os.path.join(logs_dir, "training_rewards_square_128_throughput.csv")
+with open(log_file_path, mode='w', newline='') as log_file:
+    log_writer = csv.writer(log_file)
+    log_writer.writerow(["Episode", "Total_Waiting_Time", "Total_Avg_Waiting_Time", "Total_Avg_Speed", "Total_Reward"])
 
-# Dictionary mapping agent names to their respective classes
-agent_variants = {
-    "DQNPER": DQNPERAgent,
-    # "DuelingDQN": DuelingDQNAgent,
-    # "DoubleDQN": DoubleDQNAgent,
-    # "DQN": DQNAgent
-}
+    best_total_reward: float = float('-inf')  # Track best overall reward
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Training {agent_variants}\non {device} for {EPISODES} episodes of length {TOTAL_UNITS_OF_SIMULATION}")
+    for episode in range(EPISODES):
+        start_time: float = time.time()
 
-# vehicle_flow_values = generate_vehicle_flow_list(num_of_episodes=EPISODES, num_of_flows=get_num_flows(ROUTE_FILE))
+        total_waiting_time = 0
+        total_speed = 0
+        total_rewards = 0
+        steps = 0
+        intersection_rewards = {}  # Track individual intersection rewards
 
-# Train each agent variant with different hidden layer sizes
-for agent_name, AgentClass in agent_variants.items():
-    for hidden_dim in HIDDEN_LAYER_SIZES:
-        log_file_path = os.path.join(logs_dir, f"training_rewards_{agent_name}_{hidden_dim}.csv")
+        for t in range(TOTAL_UNITS_OF_SIMULATION):
+            avg_waiting_time, avg_speed, reward, intersection_rewards_dict = sumo_wrapper.step()
+            if avg_waiting_time is None:  # Simulation ended early
+                break
+            total_waiting_time += sum(traci.lane.getWaitingTime(lane) for lane in traci.lane.getIDList())
+            total_speed += sum(traci.lane.getLastStepMeanSpeed(lane) for lane in traci.lane.getIDList()) / max(1, len(traci.lane.getIDList()))
+            total_rewards += reward
+            steps += 1
 
-        with open(log_file_path, mode='w', newline='') as log_file:
-            log_writer = csv.writer(log_file)
-            log_writer.writerow(["Agent", "Hidden_Layer_Size", "Episode", "Total_Rewards", "Average_Speed", "Average_Waiting_Time"])
+            # Store individual intersection rewards
+            for intersection_id, int_reward in intersection_rewards_dict.items():
+                if intersection_id not in intersection_rewards:
+                    intersection_rewards[intersection_id] = 0
+                intersection_rewards[intersection_id] += int_reward
 
-            agent = AgentClass(state_dim=len(env.lane_ids) * 2 + 2, action_dim=5, hidden_dim=hidden_dim)
-            best_reward = float('-inf')
-            best_model_path = os.path.join(models_dir, f"best_model_{agent_name}_{hidden_dim}.pth")
+        avg_waiting_time = total_waiting_time / max(1, steps)  # Avoid division by zero
+        avg_speed = total_speed / max(1, steps)
+        sumo_wrapper.train_agents()
 
-            for episode in range(EPISODES):
-                state = env.reset()
-                total_rewards = 0
-                total_speed = 0
-                total_waiting_time = 0
+        episode_time = time.time() - start_time
+        print(f"Episode {episode + 1}:\n"
+              f"Total Waiting Time = {total_waiting_time}\n"
+              f"Avg Waiting Time = {avg_waiting_time:.2f}\n"
+              f"Avg Speed = {avg_speed:.2f} m/s\n"
+              f"Total Reward = {total_rewards}\n"
+              f"Episode execution Time = {episode_time:.2f} seconds")
+        log_writer.writerow([episode + 1, total_waiting_time, avg_waiting_time, avg_speed, total_rewards])
 
-                for t in range(TOTAL_UNITS_OF_SIMULATION):
-                    action = agent.act(state)
-                    next_state, reward, done, waiting_time = env.step(action)
-                    agent.remember(state, action, reward, next_state)
-                    state = next_state
-                    total_rewards += reward
-                    total_waiting_time += waiting_time
-                    total_speed += sum(state[len(env.lane_ids):len(env.lane_ids) * 2]) / len(env.lane_ids)
+        # Save the best-performing models
+        if total_rewards > best_total_reward:  # Compare absolute reward value
+            best_total_reward = total_rewards
+            episode_folder = os.path.join(intersections_dir, f"episode_{episode + 1}_{total_rewards}")
+            os.makedirs(episode_folder, exist_ok=True)
 
-                avg_speed = total_speed / TOTAL_UNITS_OF_SIMULATION
-                avg_waiting_time = total_waiting_time / TOTAL_UNITS_OF_SIMULATION
-                agent.train()
+            for intersection_id, intersection in sumo_wrapper.intersections.items():
+                intersection_path = os.path.join(episode_folder, f"square_{intersection_id}_{intersection_rewards[intersection_id]}.pth")
+                torch.save(intersection.agent.model.state_dict(), intersection_path)
+                print(f"Saved best model for intersection {intersection_id} in {intersection_path}")
 
-                print(
-                    f"{agent_name} - Hidden Dim {hidden_dim} - Episode {episode + 1}: Total Rewards = {abs(total_rewards)}, "
-                    f"Total Waiting Time = {total_waiting_time}, Avg Waiting Time = {avg_waiting_time:.2f}, Avg Speed = {avg_speed}")
-                log_writer.writerow([agent_name, hidden_dim, episode + 1, total_rewards, avg_speed, avg_waiting_time])
+        sumo_wrapper.reset()
 
-                # Save the best model for this agent and hidden layer size
-                if total_rewards > best_reward:
-                    best_reward = total_rewards
-                    torch.save(agent.model.state_dict(), best_model_path)
-                    print(f"New best model for {agent_name} with hidden_dim {hidden_dim} saved.")
-
-env.close()
-print("Training complete. Best models saved in:", models_dir)
+sumo_wrapper.close()
+print("Training complete. Best models saved in:", intersections_dir)
