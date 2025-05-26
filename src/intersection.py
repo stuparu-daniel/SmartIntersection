@@ -80,7 +80,7 @@ class Intersection:
         self.previous_internal_vehicles = set()
 
         # Initialize a separate RL agent for this intersection
-        state_dim = len(self.lane_ids) * 2 + len(self.neighbors) + 4
+        state_dim = len(self.lane_ids) * 2 + 4
         action_dim = 3  # Actions: Modify green/yellow durations
         self.agent = DQNPERAgent(state_dim=state_dim, action_dim=action_dim)
 
@@ -118,12 +118,6 @@ class Intersection:
         phase = traci.trafficlight.getPhase(self.id)
         waiting_cars: list[int] = [traci.lane.getLastStepHaltingNumber(lane) for lane in self.lane_ids]
 
-        # Gather neighbor intersections' phase and next phase
-        neighbor_states = []
-        for neighbor in self.neighbors:
-            neighbor_phase = traci.trafficlight.getPhase(neighbor)
-            neighbor_states.append(neighbor_phase)
-
         current_internal_vehicles = set()
         for lane in self.internal_lanes:
             vehicles = traci.lane.getLastStepVehicleIDs(lane)
@@ -139,7 +133,7 @@ class Intersection:
                 if traci.vehicle.getSpeed(v_id) < 0.1:
                     waiting_score += 1
 
-        return np.array(num_cars + [new_vehicles_passed, waiting_score] + [phase, traci.simulation.getTime()] + neighbor_states + waiting_cars, dtype=np.float32)
+        return np.array(num_cars + [new_vehicles_passed, waiting_score] + [phase, traci.simulation.getTime()] + waiting_cars, dtype=np.float32)
 
     def step(self):
         """

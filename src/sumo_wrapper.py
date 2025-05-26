@@ -32,7 +32,7 @@ class SumoWrapper:
         intersection_rewards = {}
         for intersection in self.intersections.values():
             last_phase = traci.trafficlight.getPhase(intersection.id)
-            avg_waiting_time, avg_speed, reward = intersection.step(last_phase)
+            avg_waiting_time, avg_speed, reward = intersection.step()
             waiting_times.append(avg_waiting_time)
             speeds.append(avg_speed)
             rewards.append(reward)
